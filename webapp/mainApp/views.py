@@ -161,56 +161,66 @@ class DictionariesUnifiedView(View):
         })
 
     def post(self, request):
-        """
-        Обрабатывает добавление, редактирование и удаление элементов справочников.
-        Действие определяется по ключу в POST-запросе.
-        """
-        # === СТАТУСЫ ===
+        # --- Статусы ---
+        for key in request.POST:
+            if key.startswith("edit_status_"):
+                status_id = key.split("_")[-1]
+                obj = get_object_or_404(Status, id=status_id)
+                obj.name = request.POST.get("name")
+                obj.save()
+                return redirect("dictionaries_unified")
+            if key.startswith("delete_status_"):
+                status_id = key.split("_")[-1]
+                get_object_or_404(Status, id=status_id).delete()
+                return redirect("dictionaries_unified")
+        # --- Типы ---
+            if key.startswith("edit_type_"):
+                type_id = key.split("_")[-1]
+                obj = get_object_or_404(Type, id=type_id)
+                obj.name = request.POST.get("name")
+                obj.save()
+                return redirect("dictionaries_unified")
+            if key.startswith("delete_type_"):
+                type_id = key.split("_")[-1]
+                get_object_or_404(Type, id=status_id).delete()
+                return redirect("dictionaries_unified")
+        # --- Категории ---
+            if key.startswith("edit_category_"):
+                cat_id = key.split("_")[-1]
+                obj = get_object_or_404(Category, id=cat_id)
+                obj.name = request.POST.get("name")
+                obj.type_id = request.POST.get("type_id")
+                obj.save()
+                return redirect("dictionaries_unified")
+            if key.startswith("delete_category_"):
+                cat_id = key.split("_")[-1]
+                get_object_or_404(Category, id=cat_id).delete()
+                return redirect("dictionaries_unified")
+        # --- Подкатегории ---
+            if key.startswith("edit_subcategory_"):
+                subcat_id = key.split("_")[-1]
+                obj = get_object_or_404(SubCategory, id=subcat_id)
+                obj.name = request.POST.get("name")
+                obj.category_id = request.POST.get("category_id")
+                obj.save()
+                return redirect("dictionaries_unified")
+            if key.startswith("delete_subcategory_"):
+                subcat_id = key.split("_")[-1]
+                get_object_or_404(SubCategory, id=subcat_id).delete()
+                return redirect("dictionaries_unified")
+        # --- Добавление ---
         if "add_status" in request.POST:
             Status.objects.create(name=request.POST.get("name"))
-        elif "edit_status" in request.POST:
-            obj = get_object_or_404(Status, id=request.POST.get("id"))
-            obj.name = request.POST.get("name")
-            obj.save()
-        elif "delete_status" in request.POST:
-            get_object_or_404(Status, id=request.POST.get("id")).delete()
-
-        # === ТИПЫ ===
         elif "add_type" in request.POST:
             Type.objects.create(name=request.POST.get("name"))
-        elif "edit_type" in request.POST:
-            obj = get_object_or_404(Type, id=request.POST.get("id"))
-            obj.name = request.POST.get("name")
-            obj.save()
-        elif "delete_type" in request.POST:
-            get_object_or_404(Type, id=request.POST.get("id")).delete()
-
-        # === КАТЕГОРИИ ===
         elif "add_category" in request.POST:
             Category.objects.create(
                 name=request.POST.get("name"),
                 type_id=request.POST.get("type_id")
             )
-        elif "edit_category" in request.POST:
-            obj = get_object_or_404(Category, id=request.POST.get("id"))
-            obj.name = request.POST.get("name")
-            obj.type_id = request.POST.get("type_id")
-            obj.save()
-        elif "delete_category" in request.POST:
-            get_object_or_404(Category, id=request.POST.get("id")).delete()
-
-        # === ПОДКАТЕГОРИИ ===
         elif "add_subcategory" in request.POST:
             SubCategory.objects.create(
                 name=request.POST.get("name"),
                 category_id=request.POST.get("category_id")
             )
-        elif "edit_subcategory" in request.POST:
-            obj = get_object_or_404(SubCategory, id=request.POST.get("id"))
-            obj.name = request.POST.get("name")
-            obj.category_id = request.POST.get("category_id")
-            obj.save()
-        elif "delete_subcategory" in request.POST:
-            get_object_or_404(SubCategory, id=request.POST.get("id")).delete()
-
         return redirect("dictionaries_unified")
