@@ -4,11 +4,12 @@
 
 1. Клонируйте репозиторий:
    ```
-   git clone <URL вашего репозитория>
+   git clone https://github.com/DieSunn/Webapp-for-cash-flow-management.git
    cd -Webapp-for-cash-flow-management
    ```
 
 2. Создайте и активируйте виртуальное окружение:
+   
    Windows:
    ```
    python -m venv venv
@@ -18,10 +19,10 @@
    Linux:
    ```
    python3 -m venv venv
-   venv\bin\activate
+   source venv\bin\activate
    ```
 
-3. Установите зависимости:
+4. Установите зависимости:
    ```
    pip install -r requirements.txt
    ```
@@ -53,4 +54,3 @@
 
 ---
 
-**Проект
