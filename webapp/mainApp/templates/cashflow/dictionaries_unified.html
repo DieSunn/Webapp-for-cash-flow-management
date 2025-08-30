@@ -7,317 +7,350 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body class="container py-4">
+
     <h1 class="mb-4">Управление справочниками</h1>
 
-    <!-- ================= СТАТУСЫ ================= -->
-    <h2>Статусы 
-        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addStatus">➕</button>
-    </h2>
-    <table class="table table-striped">
-        <thead><tr><th>Название</th><th>Действия</th></tr></thead>
-        <tbody>
-        {% for s in statuses %}
-            <tr>
-                <td>{{ s.name }}</td>
-                <td>
-                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editStatus{{ s.id }}">✏️</button>
-                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteStatus{{ s.id }}">🗑</button>
-                </td>
-            </tr>
+        <!-- Статусы -->
+    <div class="card shadow mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Статусы</h5>
+            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addStatus">➕ Добавить</button>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover table-bordered mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Название</th>
+                        <th class="text-center" style="width:150px;">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for s in statuses %}
+                    <tr>
+                        <td>{{ s.name }}</td>
+                        <td class="text-center">
+                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editStatus{{ s.id }}">✏️</button>
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteStatus{{ s.id }}">🗑</button>
+                        </td>
+                    </tr>
 
-            <!-- Модалка редактирования -->
-            <div class="modal fade" id="editStatus{{ s.id }}" tabindex="-1">
-              <div class="modal-dialog"><div class="modal-content">
-                <form method="post">{% csrf_token %}
-                  <div class="modal-header"><h5 class="modal-title">Редактировать статус</h5></div>
-                  <div class="modal-body">
-                      <input type="hidden" name="id" value="{{ s.id }}">
-                      <input type="text" name="name" class="form-control" value="{{ s.name }}" required>
-                  </div>
-                  <div class="modal-footer">
-                      <button type="submit" name="edit_status" class="btn btn-primary">Сохранить</button>
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                  </div>
-                </form>
-              </div></div>
-            </div>
+                    <!-- Модульное окно редактирования -->
+                    <div class="modal fade" id="editStatus{{ s.id }}" tabindex="-1">
+                        <div class="modal-dialog"><div class="modal-content">
+                            <form method="post">{% csrf_token %}
+                                <div class="modal-header"><h5 class="modal-title">Редактировать статус</h5></div>
+                                <div class="modal-body">
+                                    <input type="text" name="name" value="{{ s.name }}" class="form-control" required>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" name="edit_status_{{ s.id }}" class="btn btn-primary">Сохранить</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                </div>
+                            </form>
+                        </div></div>
+                    </div>
 
-            <!-- Модалка удаления -->
-            <div class="modal fade" id="deleteStatus{{ s.id }}" tabindex="-1">
-              <div class="modal-dialog"><div class="modal-content">
-                <form method="post">{% csrf_token %}
-                  <div class="modal-header"><h5 class="modal-title">Удалить статус</h5></div>
-                  <div class="modal-body">
-                      <input type="hidden" name="id" value="{{ s.id }}">
-                      <p>Удалить <b>{{ s.name }}</b>?</p>
-                  </div>
-                  <div class="modal-footer">
-                      <button type="submit" name="delete_status" class="btn btn-danger">Удалить</button>
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                  </div>
-                </form>
-              </div></div>
-            </div>
-        {% empty %}
-            <tr><td colspan="2">Нет статусов</td></tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                    <!-- Модульное окно удаления -->
+                    <div class="modal fade" id="deleteStatus{{ s.id }}" tabindex="-1">
+                        <div class="modal-dialog"><div class="modal-content">
+                            <form method="post">{% csrf_token %}
+                                <div class="modal-header"><h5 class="modal-title">Удалить статус</h5></div>
+                                <div class="modal-body">
+                                    Вы уверены, что хотите удалить <b>{{ s.name }}</b>?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" name="delete_status_{{ s.id }}" class="btn btn-danger">Удалить</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                </div>
+                            </form>
+                        </div></div>
+                    </div>
+                {% empty %}
+                    <tr><td colspan="2" class="text-center">Нет данных</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    <!-- Модалка добавления -->
+    <!-- Модульное окно добавления -->
     <div class="modal fade" id="addStatus" tabindex="-1">
-      <div class="modal-dialog"><div class="modal-content">
-        <form method="post">{% csrf_token %}
-          <div class="modal-header"><h5 class="modal-title">Добавить статус</h5></div>
-          <div class="modal-body">
-              <input type="text" name="name" placeholder="Название статуса" class="form-control" required>
-          </div>
-          <div class="modal-footer">
-              <button type="submit" name="add_status" class="btn btn-success">Добавить</button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-          </div>
-        </form>
-      </div></div>
+        <div class="modal-dialog"><div class="modal-content">
+            <form method="post">{% csrf_token %}
+                <div class="modal-header"><h5 class="modal-title">Добавить статус</h5></div>
+                <div class="modal-body">
+                    <input type="text" name="name" placeholder="Название статуса" class="form-control" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" name="add_status" class="btn btn-success">Добавить</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                </div>
+            </form>
+        </div></div>
     </div>
 
 
-    <!-- ================= ТИПЫ ================= -->
-    <h2>Типы 
-        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addType">➕</button>
-    </h2>
-    <table class="table table-striped">
-        <thead><tr><th>Название</th><th>Действия</th></tr></thead>
-        <tbody>
-        {% for t in types %}
-            <tr>
-                <td>{{ t.name }}</td>
-                <td>
-                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editType{{ t.id }}">✏️</button>
-                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteType{{ t.id }}">🗑</button>
-                </td>
-            </tr>
+    <!-- Типы -->
+    <div class="card shadow mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Типы</h5>
+            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addType">➕ Добавить</button>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover table-bordered mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Название</th>
+                        <th class="text-center" style="width:150px;">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for t in types %}
+                    <tr>
+                        <td>{{ t.name }}</td>
+                        <td class="text-center">
+                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editType{{ t.id }}">✏️</button>
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteType{{ t.id }}">🗑</button>
+                        </td>
+                    </tr>
 
-            <!-- Модалки редактирования и удаления типов (аналогично статусам) -->
-            <div class="modal fade" id="editType{{ t.id }}" tabindex="-1">
-              <div class="modal-dialog"><div class="modal-content">
-                <form method="post">{% csrf_token %}
-                  <div class="modal-header"><h5 class="modal-title">Редактировать тип</h5></div>
-                  <div class="modal-body">
-                      <input type="hidden" name="id" value="{{ t.id }}">
-                      <input type="text" name="name" class="form-control" value="{{ t.name }}" required>
-                  </div>
-                  <div class="modal-footer">
-                      <button type="submit" name="edit_type" class="btn btn-primary">Сохранить</button>
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                  </div>
-                </form>
-              </div></div>
-            </div>
+                    <!-- Модульное окно редактирования -->
+                    <div class="modal fade" id="editType{{ t.id }}" tabindex="-1">
+                        <div class="modal-dialog"><div class="modal-content">
+                            <form method="post">{% csrf_token %}
+                                <div class="modal-header"><h5 class="modal-title">Редактировать тип</h5></div>
+                                <div class="modal-body">
+                                    <input type="text" name="name" value="{{ t.name }}" class="form-control" required>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" name="edit_type_{{ t.id }}" class="btn btn-primary">Сохранить</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                </div>
+                            </form>
+                        </div></div>
+                    </div>
 
-            <div class="modal fade" id="deleteType{{ t.id }}" tabindex="-1">
-              <div class="modal-dialog"><div class="modal-content">
-                <form method="post">{% csrf_token %}
-                  <div class="modal-header"><h5 class="modal-title">Удалить тип</h5></div>
-                  <div class="modal-body">
-                      <input type="hidden" name="id" value="{{ t.id }}">
-                      <p>Удалить <b>{{ t.name }}</b>?</p>
-                  </div>
-                  <div class="modal-footer">
-                      <button type="submit" name="delete_type" class="btn btn-danger">Удалить</button>
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                  </div>
-                </form>
-              </div></div>
-            </div>
-        {% empty %}
-            <tr><td colspan="2">Нет типов</td></tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                    <!-- Модульное окно удаления -->
+                    <div class="modal fade" id="deleteType{{ t.id }}" tabindex="-1">
+                        <div class="modal-dialog"><div class="modal-content">
+                            <form method="post">{% csrf_token %}
+                                <div class="modal-header"><h5 class="modal-title">Удалить тип</h5></div>
+                                <div class="modal-body">
+                                    Вы уверены, что хотите удалить <b>{{ t.name }}</b>?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" name="delete_type_{{ t.id }}" class="btn btn-danger">Удалить</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                </div>
+                            </form>
+                        </div></div>
+                    </div>
+                {% empty %}
+                    <tr><td colspan="2" class="text-center">Нет данных</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
+    <!-- Модульное окно добавления -->
     <div class="modal fade" id="addType" tabindex="-1">
-      <div class="modal-dialog"><div class="modal-content">
-        <form method="post">{% csrf_token %}
-          <div class="modal-header"><h5 class="modal-title">Добавить тип</h5></div>
-          <div class="modal-body">
-              <input type="text" name="name" placeholder="Название типа" class="form-control" required>
-          </div>
-          <div class="modal-footer">
-              <button type="submit" name="add_type" class="btn btn-success">Добавить</button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-          </div>
-        </form>
-      </div></div>
+        <div class="modal-dialog"><div class="modal-content">
+            <form method="post">{% csrf_token %}
+                <div class="modal-header"><h5 class="modal-title">Добавить тип</h5></div>
+                <div class="modal-body">
+                    <input type="text" name="name" placeholder="Название типа" class="form-control" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" name="add_type" class="btn btn-success">Добавить</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                </div>
+            </form>
+        </div></div>
     </div>
 
+        <!-- Категории -->
+    <div class="card shadow mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Категории</h5>
+            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addCategory">➕ Добавить</button>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover table-bordered mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Название</th>
+                        <th style="width:40%;">Тип</th>
+                        <th class="text-center" style="width:150px;">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for c in categories %}
+                    <tr>
+                        <td>{{ c.name }}</td>
+                        <td>{{ c.type.name }}</td>
+                        <td class="text-center">
+                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCategory{{ c.id }}">✏️</button>
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCategory{{ c.id }}">🗑</button>
+                        </td>
+                    </tr>
 
-    <!-- ================= КАТЕГОРИИ ================= -->
-    <h2>Категории 
-        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addCategory">➕</button>
-    </h2>
-    <table class="table table-striped">
-        <thead><tr><th>Название</th><th>Тип</th><th>Действия</th></tr></thead>
-        <tbody>
-        {% for c in categories %}
-            <tr>
-                <td>{{ c.name }}</td>
-                <td>{{ c.type.name }}</td>
-                <td>
-                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editCategory{{ c.id }}">✏️</button>
-                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCategory{{ c.id }}">🗑</button>
-                </td>
-            </tr>
+                    <!-- Модульное окно редактирования -->
+                    <div class="modal fade" id="editCategory{{ c.id }}" tabindex="-1">
+                        <div class="modal-dialog"><div class="modal-content">
+                            <form method="post">{% csrf_token %}
+                                <div class="modal-header"><h5 class="modal-title">Редактировать категорию</h5></div>
+                                <div class="modal-body">
+                                    <input type="text" name="name" value="{{ c.name }}" class="form-control mb-3" required>
+                                    <select name="type_id" class="form-select" required>
+                                        {% for t in types %}
+                                            <option value="{{ t.id }}" {% if c.type.id == t.id %}selected{% endif %}>{{ t.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" name="edit_category_{{ c.id }}" class="btn btn-primary">Сохранить</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                </div>
+                            </form>
+                        </div></div>
+                    </div>
 
-            <!-- Модалка редактирования категории -->
-            <div class="modal fade" id="editCategory{{ c.id }}" tabindex="-1">
-              <div class="modal-dialog"><div class="modal-content">
-                <form method="post">{% csrf_token %}
-                  <div class="modal-header"><h5 class="modal-title">Редактировать категорию</h5></div>
-                  <div class="modal-body">
-                      <input type="hidden" name="id" value="{{ c.id }}">
-                      <input type="text" name="name" class="form-control" value="{{ c.name }}" required>
-                      <select name="type_id" class="form-select mt-2" required>
-                          {% for t in types %}
-                              <option value="{{ t.id }}" {% if t.id == c.type.id %}selected{% endif %}>{{ t.name }}</option>
-                          {% endfor %}
-                      </select>
-                  </div>
-                  <div class="modal-footer">ф
-                      <button type="submit" name="edit_category" class="btn btn-primary">Сохранить</button>
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                  </div>
-                </form>
-              </div></div>
-            </div>
+                    <!-- Модульное окно удаления -->
+                    <div class="modal fade" id="deleteCategory{{ c.id }}" tabindex="-1">
+                        <div class="modal-dialog"><div class="modal-content">
+                            <form method="post">{% csrf_token %}
+                                <div class="modal-header"><h5 class="modal-title">Удалить категорию</h5></div>
+                                <div class="modal-body">
+                                    Вы уверены, что хотите удалить <b>{{ c.name }}</b>?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" name="delete_category_{{ c.id }}" class="btn btn-danger">Удалить</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                </div>
+                            </form>
+                        </div></div>
+                    </div>
+                {% empty %}
+                    <tr><td colspan="3" class="text-center">Нет данных</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-            <!-- Модалка удаления категории -->
-            <div class="modal fade" id="deleteCategory{{ c.id }}" tabindex="-1">
-              <div class="modal-dialog"><div class="modal-content">
-                <form method="post">{% csrf_token %}
-                  <div class="modal-header"><h5 class="modal-title">Удалить категорию</h5></div>
-                  <div class="modal-body">
-                      <input type="hidden" name="id" value="{{ c.id }}">
-                      <p>Удалить <b>{{ c.name }}</b>?</p>
-                  </div>
-                  <div class="modal-footer">
-                      <button type="submit" name="delete_category" class="btn btn-danger">Удалить</button>
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                  </div>
-                </form>
-              </div></div>
-            </div>
-        {% empty %}
-            <tr><td colspan="3">Нет категорий</td></tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
+    <!-- Модульное окно добавления -->
     <div class="modal fade" id="addCategory" tabindex="-1">
-      <div class="modal-dialog"><div class="modal-content">
-        <form method="post">{% csrf_token %}
-          <div class="modal-header"><h5 class="modal-title">Добавить категорию</h5></div>
-          <div class="modal-body">
-              <input type="text" name="name" placeholder="Название категории" class="form-control" required>
-              <select name="type_id" class="form-select mt-2" required>
-                  <option value="">-- выберите тип --</option>
-                  {% for t in types %}
-                      <option value="{{ t.id }}">{{ t.name }}</option>
-                  {% endfor %}
-              </select>
-          </div>
-          <div class="modal-footer">
-              <button type="submit" name="add_category" class="btn btn-success">Добавить</button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-          </div>
-        </form>
-      </div></div>
+        <div class="modal-dialog"><div class="modal-content">
+            <form method="post">{% csrf_token %}
+                <div class="modal-header"><h5 class="modal-title">Добавить категорию</h5></div>
+                <div class="modal-body">
+                    <input type="text" name="name" placeholder="Название" class="form-control mb-3" required>
+                    <select name="type_id" class="form-select" required>
+                        {% for t in types %}
+                            <option value="{{ t.id }}">{{ t.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" name="add_category" class="btn btn-success">Добавить</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                </div>
+            </form>
+        </div></div>
     </div>
 
 
-    <!-- ================= ПОДКАТЕГОРИИ ================= -->
-    <h2>Подкатегории 
-        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addSubCategory">➕</button>
-    </h2>
-    <table class="table table-striped">
-        <thead><tr><th>Название</th><th>Категория</th><th>Действия</th></tr></thead>
-        <tbody>
-        {% for sc in subcategories %}
-            <tr>
-                <td>{{ sc.name }}</td>
-                <td>{{ sc.category.name }}</td>
-                <td>
-                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editSubCategory{{ sc.id }}">✏️</button>
-                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteSubCategory{{ sc.id }}">🗑</button>
-                </td>
-            </tr>
+    <!-- Подкатегории -->
+    <div class="card shadow mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Подкатегории</h5>
+            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addSubcategory">➕ Добавить</button>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover table-bordered mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Название</th>
+                        <th style="width:40%;">Категория</th>
+                        <th class="text-center" style="width:150px;">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for sc in subcategories %}
+                    <tr>
+                        <td>{{ sc.name }}</td>
+                        <td>{{ sc.category.name }}</td>
+                        <td class="text-center">
+                            <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editSubcategory{{ sc.id }}">✏️</button>
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteSubcategory{{ sc.id }}">🗑</button>
+                        </td>
+                    </tr>
 
-            <!-- Модалка редактирования подкатегории -->
-            <div class="modal fade" id="editSubCategory{{ sc.id }}" tabindex="-1">
-              <div class="modal-dialog"><div class="modal-content">
-                <form method="post">{% csrf_token %}
-                  <div class="modal-header"><h5 class="modal-title">Редактировать подкатегорию</h5></div>
-                  <div class="modal-body">
-                      <input type="hidden" name="id" value="{{ sc.id }}">
-                      <input type="text" name="name" class="form-control" value="{{ sc.name }}" required>
-                      <select name="category_id" class="form-select mt-2" required>
-                          {% for c in categories %}
-                              <option value="{{ c.id }}" {% if c.id == sc.category.id %}selected{% endif %}>{{ c.name }}</option>
-                          {% endfor %}
-                      </select>
-                  </div>
-                  <div class="modal-footer">
-                      <button type="submit" name="edit_subcategory" class="btn btn-primary">Сохранить</button>
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                  </div>
-                </form>
-              </div></div>
-            </div>
+                    <!-- Модульное окно редактирования -->
+                    <div class="modal fade" id="editSubcategory{{ sc.id }}" tabindex="-1">
+                        <div class="modal-dialog"><div class="modal-content">
+                            <form method="post">{% csrf_token %}
+                                <div class="modal-header"><h5 class="modal-title">Редактировать подкатегорию</h5></div>
+                                <div class="modal-body">
+                                    <input type="text" name="name" value="{{ sc.name }}" class="form-control mb-3" required>
+                                    <select name="category_id" class="form-select" required>
+                                        {% for c in categories %}
+                                            <option value="{{ c.id }}" {% if sc.category.id == c.id %}selected{% endif %}>{{ c.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" name="edit_subcategory_{{ sc.id }}" class="btn btn-primary">Сохранить</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                </div>
+                            </form>
+                        </div></div>
+                    </div>
 
-            <!-- Модалка удаления подкатегории -->
-            <div class="modal fade" id="deleteSubCategory{{ sc.id }}" tabindex="-1">
-              <div class="modal-dialog"><div class="modal-content">
-                <form method="post">{% csrf_token %}
-                  <div class="modal-header"><h5 class="modal-title">Удалить подкатегорию</h5></div>
-                  <div class="modal-body">
-                      <input type="hidden" name="id" value="{{ sc.id }}">
-                      <p>Удалить <b>{{ sc.name }}</b>?</p>
-                  </div>
-                  <div class="modal-footer">
-                      <button type="submit" name="delete_subcategory" class="btn btn-danger">Удалить</button>
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                  </div>
-                </form>
-              </div></div>
-            </div>
-        {% empty %}
-            <tr><td colspan="3">Нет подкатегорий</td></tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <div class="modal fade" id="addSubCategory" tabindex="-1">
-      <div class="modal-dialog"><div class="modal-content">
-        <form method="post">{% csrf_token %}
-          <div class="modal-header"><h5 class="modal-title">Добавить подкатегорию</h5></div>
-          <div class="modal-body">
-              <input type="text" name="name" placeholder="Название подкатегории" class="form-control" required>
-              <select name="category_id" class="form-select mt-2" required>
-                  <option value="">-- выберите категорию --</option>
-                  {% for c in categories %}
-                      <option value="{{ c.id }}">{{ c.name }}</option>
-                  {% endfor %}
-              </select>
-          </div>
-          <div class="modal-footer">
-              <button type="submit" name="add_subcategory" class="btn btn-success">Добавить</button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-          </div>
-        </form>
-      </div></div>
+                    <!-- Модульное окно удаления -->
+                    <div class="modal fade" id="deleteSubcategory{{ sc.id }}" tabindex="-1">
+                        <div class="modal-dialog"><div class="modal-content">
+                            <form method="post">{% csrf_token %}
+                                <div class="modal-header"><h5 class="modal-title">Удалить подкатегорию</h5></div>
+                                <div class="modal-body">
+                                    Вы уверены, что хотите удалить <b>{{ sc.name }}</b>?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" name="delete_subcategory_{{ sc.id }}" class="btn btn-danger">Удалить</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                </div>
+                            </form>
+                        </div></div>
+                    </div>
+                {% empty %}
+                    <tr><td colspan="3" class="text-center">Нет данных</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
+    <!-- Модульное окно обавления -->
+    <div class="modal fade" id="addSubcategory" tabindex="-1">
+        <div class="modal-dialog"><div class="modal-content">
+            <form method="post">{% csrf_token %}
+                <div class="modal-header"><h5 class="modal-title">Добавить подкатегорию</h5></div>
+                <div class="modal-body">
+                    <input type="text" name="name" placeholder="Название" class="form-control mb-3" required>
+                    <select name="category_id" class="form-select" required>
+                        {% for c in categories %}
+                            <option value="{{ c.id }}">{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" name="add_subcategory" class="btn btn-success">Добавить</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                </div>
+            </form>
+        </div></div>
+    </div>
 
-    <hr>
-    <a href="{% url 'cashflow_list' %}" class="btn btn-outline-primary">⬅ Вернуться к записям</a>
 </body>
 </html>

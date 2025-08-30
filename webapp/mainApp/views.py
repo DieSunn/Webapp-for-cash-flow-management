@@ -5,17 +5,24 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView, T
 from django.apps import apps
 from .models import CashFlow, Status, Type, Category, SubCategory
 from .forms import CashFlowForm
+from django.contrib import messages
 
 
 #----------------------- Представления для главной страницы и редактирования записей ----------------------#
 
 class CashFlowListView(ListView):
+    """
+    Список записей денежных потоков с фильтрацией и пагинацией.
+    """
     model = CashFlow
     template_name = 'cashflow/cashflow_list.html'
     context_object_name = 'cashflows'
     paginate_by = 15
 
     def get_queryset(self):
+        """
+        Возвращает QuerySet с применёнными фильтрами по дате, статусу, типу, категории и подкатегории.
+        """
         qs = CashFlow.objects.all()
 
         # --- фильтрация ---
@@ -42,6 +49,9 @@ class CashFlowListView(ListView):
         return qs.order_by("-created_at")
 
     def get_context_data(self, **kwargs):
+        """
+        Добавляет справочники в контекст для фильтрации.
+        """
         ctx = super().get_context_data(**kwargs)
         ctx["statuses"] = Status.objects.all()
         ctx["types"] = Type.objects.all()
@@ -50,8 +60,10 @@ class CashFlowListView(ListView):
         return ctx
 
 
-
 class CashFlowCreateView(CreateView):
+    """
+    Класс для создания новой записи движения денежных средств.
+    """
     model = CashFlow
     form_class = CashFlowForm
     template_name = 'cashflow/cashflow_form.html'
@@ -59,6 +71,9 @@ class CashFlowCreateView(CreateView):
 
 
 class CashFlowUpdateView(UpdateView):
+    """
+    Класс для редактирования существующей записи движения денежных средств.
+    """
     model = CashFlow
     form_class = CashFlowForm
     template_name = 'cashflow/cashflow_form.html'
@@ -66,18 +81,78 @@ class CashFlowUpdateView(UpdateView):
 
 
 class CashFlowDeleteView(DeleteView):
+    """
+    Класс для удаления записи движения денежных средств.
+    """
     model = CashFlow
     template_name = 'cashflow/cashflow_confirm_delete.html'
     success_url = reverse_lazy('cashflow_list')
 
 
+def cashflow_create(request):
+    """
+    Функция для создания записи движения денежных средств через форму.
+    Обрабатывает POST-запрос, сохраняет запись, выводит сообщения.
+    """
+    if request.method == "POST":
+        form = CashFlowForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Запись успешно создана ✅")
+            return redirect("record_list")  # на список записей
+        else:
+            messages.error(request, "Исправьте ошибки в форме ⛔")
+    else:
+        form = CashFlowForm()
+
+    context = {
+        "form": form,
+        "type": Type.objects.all(),           
+        "category": Category.objects.all(),  
+        "subcategories": SubCategory.objects.all(),
+    }
+    return render(request, "cashflow_form.html", context)
+
+
+def cashflow_edit(request, pk):
+    """
+    Функция для редактирования записи движения денежных средств.
+    Загружает запись по pk, обрабатывает POST-запрос, сохраняет изменения.
+    """
+    record = get_object_or_404(CashFlow, pk=pk)
+
+    if request.method == "POST":
+        form = CashFlowForm(request.POST, instance=record)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Запись успешно обновлена ✅")
+            return redirect("record_list")
+        else:
+            messages.error(request, "Исправьте ошибки в форме ⛔")
+    else:
+        form = CashFlowForm(instance=record)
+
+    context = {
+        "form": form,
+        "type": Type.objects.all(),
+        "category": Category.objects.all(),
+        "subcategories": SubCategory.objects.all(),
+    }
+    return render(request, "cashflow_form.html", context)
+
 #------------------------------- Представления для управления справочниками -------------------------------#
 
 
 class DictionariesUnifiedView(View):
+    """
+    Класс для управления всеми справочниками (статусы, типы, категории, подкатегории) на одной странице.
+    """
     template_name = "cashflow/dictionaries_unified.html"
 
     def get(self, request):
+        """
+        Отображает страницу со всеми справочниками.
+        """
         return render(request, self.template_name, {
             "statuses": Status.objects.all(),
             "types": Type.objects.all(),
@@ -86,6 +161,10 @@ class DictionariesUnifiedView(View):
         })
 
     def post(self, request):
+        """
+        Обрабатывает добавление, редактирование и удаление элементов справочников.
+        Действие определяется по ключу в POST-запросе.
+        """
         # === СТАТУСЫ ===
         if "add_status" in request.POST:
             Status.objects.create(name=request.POST.get("name"))
