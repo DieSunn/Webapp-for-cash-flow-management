@@ -4,6 +4,34 @@ import django.utils.timezone
 from django.db import migrations, models
 
 
+
+def create_initial_data(apps, schema_editor):
+    Status = apps.get_model('mainApp', 'Status')
+    Type = apps.get_model('mainApp', 'Type')
+    Category = apps.get_model('mainApp', 'Category')
+    SubCategory = apps.get_model('mainApp', 'SubCategory')
+    
+    # 1. Создание начальных данных для Status
+    status_business, _ = Status.objects.get_or_create(name='Бизнес')
+    status_personal, _ = Status.objects.get_or_create(name='Личное')
+    status_tax, _ = Status.objects.get_or_create(name='Налог')
+
+    # 2. Создание начальных данных для Type
+    type_income, _ = Type.objects.get_or_create(name='Пополнение')
+    type_expense, _ = Type.objects.get_or_create(name='Списание')
+
+    # 3. Создание начальных данных для Category и SubCategory
+    # Категория "Инфраструктура"
+    category_infra, _ = Category.objects.get_or_create(name='Инфраструктура', type=type_expense) # Предполагаем, что это списание
+    SubCategory.objects.get_or_create(name='VPS', category=category_infra)
+    SubCategory.objects.get_or_create(name='Proxy', category=category_infra)
+
+    # Категория "Маркетинг"
+    category_marketing, _ = Category.objects.get_or_create(name='Маркетинг', type=type_expense) # Предполагаем, что это списание
+    SubCategory.objects.get_or_create(name='Farpost', category=category_marketing)
+    SubCategory.objects.get_or_create(name='Avito', category=category_marketing)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
