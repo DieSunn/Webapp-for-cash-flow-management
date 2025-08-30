@@ -9,6 +9,7 @@
    ```
 
 2. Создайте и активируйте виртуальное окружение:
+   
    Windows:
    ```
    python -m venv venv
@@ -21,7 +22,7 @@
    venv\bin\activate
    ```
 
-3. Установите зависимости:
+4. Установите зависимости:
    ```
    pip install -r requirements.txt
    ```
