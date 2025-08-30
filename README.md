@@ -4,7 +4,7 @@
 
 1. Клонируйте репозиторий:
    ```
-   git clone <URL вашего репозитория>
+   git clone https://github.com/DieSunn/Webapp-for-cash-flow-management.git
    cd -Webapp-for-cash-flow-management
    ```
 
